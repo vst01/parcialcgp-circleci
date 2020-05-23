@@ -72,4 +72,4 @@ workflows:
             - Manual-Approval
           filters:
             branches:
-              only: gke-eu          
+              only: master   
