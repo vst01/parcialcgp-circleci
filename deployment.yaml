@@ -1,65 +1,129 @@
 apiVersion: apps/v1
+
 kind: Deployment
+
 metadata:
-  name: web1
+
+  name: appweb1
+
 spec:
-  replicas: 4
-  selector:
-      matchLabels:
-        app: web1
-  template:
-    metadata:
-      labels:
-        app: web1
-    spec:
-      containers:
-      - name: web1
-        image: sockshead/react-img:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-      restartPolicy: Always
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: web2
-spec:
-  replicas: 4
-  selector:
-      matchLabels:
-        app: web2
-  template:
-    metadata:
-      labels:
-        app: web2
-    spec:
-      containers:
-      - name: web2
-        image: nikcarp/node-app:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-      restartPolicy: Always    
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: web
-spec:
+
   replicas: 2
+
   selector:
+
       matchLabels:
-        app: web
+
+        app: appweb1
+
   template:
+
     metadata:
+
       labels:
-        app: web
+
+        app: appweb1
+
     spec:
+
       containers:
-      - name: web
-        image: sockshead/react-img:latest
+
+      - name: appweb1
+
+        image: sockshead/react-app:latest
+
         imagePullPolicy: Always
+
         ports:
+
         - containerPort: 80
+
+      restartPolicy: Always
+
+---
+
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: appweb2
+
+spec:
+
+  replicas: 2
+
+  selector:
+
+      matchLabels:
+
+        app: appweb2
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: appweb2
+
+    spec:
+
+      containers:
+
+      - name: appweb2
+
+        image: sockshead/node-app:latest
+
+        imagePullPolicy: Always
+
+        ports:
+
+        - containerPort: 80
+
+      restartPolicy: Always    
+
+---
+
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: appweb
+
+spec:
+
+  replicas: 2
+
+  selector:
+
+      matchLabels:
+
+        app: appweb
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: appweb
+
+    spec:
+
+      containers:
+
+      - name: appweb
+
+        image: sockshead/react-app:latest
+
+        imagePullPolicy: Always
+
+        ports:
+
+        - containerPort: 80
+
       restartPolicy: Always  
