@@ -1,13 +1,13 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: appweb1-service
+  name: web1-service
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: NodePort
   selector:
-    app: appweb1
+    app: web1
   ports:
     - port: 80 # Default port for image
       nodePort: 31000
@@ -15,7 +15,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: appweb2-service
+  name: web2-service
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
 spec:
@@ -29,13 +29,13 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: appweb-service
+  name: web-service
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: NodePort
   selector:
-    app: appweb
+    app: web
   ports:
     - port: 80 # Default port for image
       nodePort: 31003
