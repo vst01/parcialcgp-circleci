@@ -1,13 +1,75 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
-version: 2.1
-# Use a package of configuration called an orb.
-orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
-# Orchestrate or schedule a set of jobs
+version: 2
+jobs:
+  Development:
+    docker:
+      - image: google/cloud-sdk
+    environment:
+      - PROJECT_NAME: "infraparcial"
+      - GOOGLE_PROJECT_ID: "infraparcial"
+      - GOOGLE_COMPUTE_ZONE: "us-central1-f"
+      - GOOGLE_CLUSTER_NAME: "gke-us"
+    steps:
+      - checkout
+      - run: 
+          name: Setup Google Cloud SDK
+          command: |
+            apt-get install -qq -y gettext
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}	
+            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+      - setup_remote_docker
+      - run: 
+          name: Deploy to Kubernetes
+          command: |
+            kubectl delete all --all
+            kubectl apply -f ${HOME}/project/deployment.yaml
+            kubectl apply -f ${HOME}/project/service.yaml
+            kubectl apply -f ${HOME}/project/ingress.yaml
+  Production:
+    docker:
+      - image: google/cloud-sdk
+    environment:
+      - PROJECT_NAME: "infraparcial"
+      - GOOGLE_PROJECT_ID: "infraparcial"
+      - GOOGLE_COMPUTE_ZONE: "europe-west1-c"
+      - GOOGLE_CLUSTER_NAME: "gke-eu"
+    steps:
+      - checkout
+      - run: 
+          name: Setup Google Cloud SDK
+          command: |
+            apt-get install -qq -y gettext
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}	
+            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}  
+      - setup_remote_docker
+      - run: 
+          name: Deploy to Kubernetes
+          command: |
+            kubectl delete all --all
+            kubectl apply -f ${HOME}/project/deployment.yaml
+            kubectl apply -f ${HOME}/project/service.yaml
+            kubectl apply -f ${HOME}/project/ingress.yaml
+
 workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
+  version: 2
+  build:
     jobs:
-      - welcome/run
+      - Development:
+          filters:
+            branches:
+              only: master
+      - Manual-Approval:
+          type: approval
+          requires:
+            - Development
+      - Production:
+          requires:
+            - Manual-Approval
+          filters:
+            branches:
+              only: master           
