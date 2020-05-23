@@ -66,7 +66,7 @@ workflows:
       - Manual-Approval:
           type: approval
           requires:
-            - Deployment
+            - Development
       - Production:
           requires:
             - Manual-Approval
