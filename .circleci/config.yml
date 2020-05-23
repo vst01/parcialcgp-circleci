@@ -66,10 +66,10 @@ workflows:
       - Manual-Approval:
           type: approval
           requires:
-            - Development
+            - gke-us
       - Production:
           requires:
             - Manual-Approval
           filters:
             branches:
-              only: master           
+              only: gke-eu          
